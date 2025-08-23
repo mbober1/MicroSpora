@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "JLink Debug STM32G431CB",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/zephyr/zephyr.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "jlink",
+      "serverpath": "/opt/SEGGER/JLink/JLinkGDBServerCLExe",
+      "armToolchainPath": "${env:ZEPHYR_SDK}/${env:TOOLCHAIN}/bin",
+      "toolchainPrefix": "${env:TOOLCHAIN}",
+      "interface": "swd",
+      // "serverArgs": ["-speed", "50"],
+      "device": "STM32G431CB",
+      "svdFile": "STM32G431xx.svd",
+      "preLaunchTask": "Build"
+    },
+  ]
+}

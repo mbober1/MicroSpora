@@ -1,0 +1,50 @@
+name: ZephyrOS development enviroment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/publish-dev-env.yaml
+      - .devcontainer/Dockerfile.devel
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: zephyros-dev-env
+  NAMESPACE: ${{ github.repository_owner }} 
+  REPOSITORY: ${{ github.event.repository.name }} 
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3.4.0
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5.7.0
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}
+
+    - name: Build and push Docker image
+      id: push
+      uses: docker/build-push-action@v6.15.0
+      with:
+        file: .devcontainer/Dockerfile.devel
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}

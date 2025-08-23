@@ -1,0 +1,46 @@
+name: Publish firmware
+
+on:
+  workflow_dispatch:
+    inputs:
+      builder_image:
+        description: 'Builder image'
+        default: 'ghcr.io/mbober1/stm32mp1_zephyros/zephyros-builder:master'
+        type: string
+      board_name:
+        description: 'Board name'
+        default: 'stm32mp157c_dk2'
+        type: string
+      app_dir:
+        description: 'App directory'
+        default: 'app'
+        type: string
+  push:
+    paths:
+      - .github/workflows/publish-firmware.yaml
+
+env:
+  BOARD_NAME: ${{ github.event.inputs.board_name || 'stm32mp157c_dk2' }}
+  APP_DIR: ${{ github.event.inputs.app_dir || 'app' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image:  ${{ github.event.inputs.builder_image || 'ghcr.io/mbober1/stm32mp1_zephyros/zephyros-builder:master' }}
+      options: --user root
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build firmware
+        shell: bash
+        run: |
+          west build -p -b $BOARD_NAME $APP_DIR
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware.elf
+          path: build/zephyr/zephyr.elf
+          overwrite: true

@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env:ZEPHYR_BASE}/include"
+            ],
+            "defines": [],
+            "compilerPath": "${env:ZEPHYR_SDK}/${env:TOOLCHAIN}/bin/${env:TOOLCHAIN}-gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

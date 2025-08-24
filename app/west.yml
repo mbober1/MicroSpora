@@ -1,0 +1,31 @@
+# Copyright (c) 2025 Marcin Bober
+# SPDX-License-Identifier: Apache-2.0
+
+manifest:
+  self:
+    path: app
+
+  remotes:
+    - name: zephyr
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyr
+      repo-path: zephyr
+      revision: main
+      import:
+        name-allowlist:
+          - cmsis
+          - cmsis-dsp
+          - hal_stm32
+
+    - name: mt6701
+      path: modules/mt6701
+      revision: master
+      url: https://github.com/mbober1/MT6701-Zephyr-Module
+
+    - name: spinner
+      path: modules/spinner
+      revision: main
+      url: https://github.com/teslabs/spinner

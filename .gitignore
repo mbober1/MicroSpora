@@ -1,1 +1,4 @@
 build
+.west
+modules
+zephyr

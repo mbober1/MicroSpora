@@ -1,7 +1,7 @@
 FROM ubuntu:24.04 AS base
 
 ENV TOOLCHAIN="arm-zephyr-eabi"
-ENV ZSDK_VERSION="0.17.1"
+ENV ZSDK_VERSION="0.17.4"
 ARG ZEPHYR_SDK_DIR="/opt"
 ENV ZEPHYR_SDK=${ZEPHYR_SDK_DIR}/zephyr-sdk-${ZSDK_VERSION}
 ENV DEBIAN_FRONTEND=noninteractive
@@ -68,6 +68,3 @@ USER ${USERNAME}
 WORKDIR /home/${USERNAME}/workspace
 
 COPY --from=step-sdk /opt/zephyr-sdk-${ZSDK_VERSION} /opt/zephyr-sdk-${ZSDK_VERSION}
-
-RUN west init
-RUN west update

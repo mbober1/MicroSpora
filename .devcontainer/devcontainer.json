@@ -1,7 +1,7 @@
 {
   "name": "vscode-zephyr",
-  //"dockerFile": "Dockerfile.ci",
-   "image": "ghcr.io/mbober1/stm32mp1_zephyros/zephyros-dev-env:master",
+  "dockerFile": "Dockerfile.ci",
+  //  "image": "ghcr.io/mbober1/stm32mp1_zephyros/zephyros-dev-env:master",
   // "image": "zephyrprojectrtos/ci:latest",
 
   "runArgs": [

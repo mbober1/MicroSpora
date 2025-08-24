@@ -18,6 +18,7 @@ manifest:
         name-allowlist:
           - cmsis
           - cmsis-dsp
+          - cmsis_6
           - hal_stm32
 
     - name: mt6701

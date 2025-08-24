@@ -1,4 +1,4 @@
-FROM ubuntu:24.04 AS base
+FROM ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0 AS base
 
 ENV TOOLCHAIN="arm-zephyr-eabi"
 ENV ZSDK_VERSION="0.17.4"
@@ -56,7 +56,7 @@ ENV ZEPHYR_BASE=/home/${USERNAME}/workspace/zephyr
 ENV PATH="${ZEPHYR_BASE}/scripts:${PATH}"
 
 # Install Python dependencies
-RUN	pip3 install --no-cache-dir --break-system-packages \
+RUN	pip3 install --no-cache-dir \
 		-r https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/main/scripts/requirements.txt \
 		-r https://raw.githubusercontent.com/zephyrproject-rtos/mcuboot/main/scripts/requirements.txt \
 		GitPython imgtool junitparser junit2html numpy protobuf PyGithub \
@@ -64,6 +64,7 @@ RUN	pip3 install --no-cache-dir --break-system-packages \
 		nrf-regtool~=7.0.0 && \
 	pip3 check
 
+RUN groupadd -r ${USERNAME} && useradd -m -s /bin/bash -r -g ${USERNAME} ${USERNAME}
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}/workspace
 

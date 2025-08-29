@@ -1,33 +1,33 @@
 pipeline {
-    agent {
-        dockerfile {
-            filename '.devcontainer/Dockerfile.ci'
-        }
-    }
+    agent none
 
     environment {
-        BOARD_NAME = "stm32mp157c_dk2"
+        BOARD_NAME = "microspora"
         APP_DIR = 'app'
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                sh 'ls -al'
+        stage('Build in Docker') {
+            agent {
+                dockerfile {
+                    filename '.devcontainer/Dockerfile.ci'
+                    args '-u root:root'
+                }
             }
-        }
-
-        stage('Build') {
             steps {
+                checkout scm
                 sh '''
-                west build -p -b ${BOARD_NAME} ${APP_DIR}
-                '''
-            }
-        }
+                    echo "=== Preparing Zephyr workspace ==="
+                    west init -l app || true
+                    west update
+                    west zephyr-export
 
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: 'build/zephyr/zephyr.elf', fingerprint: true
+                    echo "=== Building application ==="
+                    ls -al
+                    export ZEPHYR_BASE=$PWD/zephyr
+                    west build -p -b ${BOARD_NAME} $PWD/${APP_DIR} -DBOARD_ROOT=$PWD
+                '''
+                archiveArtifacts artifacts: "build/zephyr/zephyr.elf", fingerprint: true
             }
         }
     }

@@ -15,8 +15,6 @@
 
 	chosen {
 		zephyr,console = &usart1;
-		zephyr,shell-uart = &usart1;
-		zephyr,uart-mcumgr = &usart1;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 	};
@@ -44,6 +42,7 @@
 		led0 = &red_led;
 		mcuboot-led0 = &red_led;
 		sw0 = &user_button;
+		adc0 = &adc1;
 		watchdog0 = &iwdg;
 	};
 };
@@ -129,12 +128,45 @@ zephyr_udc0: &usb {
 &timers1 {
 	status = "okay";
 
-	pwm1: pwm {
+	svpwm: svpwm {
 		status = "okay";
 		pinctrl-0 = <&tim1_ch3_pa10 &tim1_ch2_pa9 &tim1_ch1_pa8 &tim1_ch3n_pb15 &tim1_ch2n_pb14 &tim1_ch1n_pb13>;
 		pinctrl-names = "default";
 	};
 };
+
+&adc1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	st,adc-clock-source = "SYNC";
+	st,adc-prescaler = <4>;
+	status = "okay";
+
+	channel@1 {
+		reg = <1>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+		zephyr,resolution = <12>;
+	};
+
+	channel@2 {
+		reg = <2>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+		zephyr,resolution = <12>;
+	};
+
+	channel@3 {
+		reg = <3>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+		zephyr,resolution = <12>;
+	};
+};
+
 
 &vref {
 	status = "okay";

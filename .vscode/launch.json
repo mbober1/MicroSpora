@@ -15,7 +15,8 @@
       // "serverArgs": ["-speed", "50"],
       "device": "STM32G431CB",
       "svdFile": "STM32G431xx.svd",
-      "preLaunchTask": "Build"
+      "preLaunchTask": "Build",
+      "runToEntryPoint": "main"
     },
   ]
 }

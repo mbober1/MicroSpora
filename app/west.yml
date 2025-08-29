@@ -20,13 +20,14 @@ manifest:
           - cmsis-dsp
           - cmsis_6
           - hal_stm32
+          - segger
 
     - name: mt6701
-      path: modules/mt6701
+      path: modules/lib/mt6701
       revision: master
       url: https://github.com/mbober1/MT6701-Zephyr-Module
 
     - name: spinner
-      path: modules/spinner
+      path: modules/lib/spinner
       revision: main
       url: https://github.com/teslabs/spinner

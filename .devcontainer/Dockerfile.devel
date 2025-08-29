@@ -1,6 +1,7 @@
-FROM ghcr.io/mbober1/stm32mp1_zephyros/zephyros-builder:master
+FROM ghcr.io/mbober1/microspora/zephyros-builder:master@sha256:5ec0913836b43d1df37e8db5d7e081d825aa78aef8c50fe81e6d478bc32a36ca
 
 ARG USERNAME="ubuntu"
+ENV DEBIAN_FRONTEND=noninteractive
 USER root
 
 RUN apt-get -y update && \
@@ -58,6 +59,6 @@ RUN wget -q --post-data "accept_license_agreement=accepted" https://www.segger.c
 	rm ./JLink_Linux_x86_64.deb
 
 USER ${USERNAME}
-RUN usermod -a -G dialout ${USERNAME}
-RUN usermod -a -G plugdev ${USERNAME}
-WORKDIR /home/${USERNAME}/workspace
+# RUN usermod -a -G dialout ${USERNAME}
+# RUN usermod -a -G plugdev ${USERNAME}
+# WORKDIR /home/${USERNAME}/workspace

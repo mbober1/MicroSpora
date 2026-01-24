@@ -1,8 +1,60 @@
-FROM ghcr.io/mbober1/microspora/zephyros-builder:master@sha256:5ec0913836b43d1df37e8db5d7e081d825aa78aef8c50fe81e6d478bc32a36ca
+FROM ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0 AS base
 
+ENV TOOLCHAIN="arm-zephyr-eabi"
+ENV ZSDK_VERSION="0.17.4"
+ARG ZEPHYR_SDK_DIR="/opt"
+ENV ZEPHYR_SDK=${ZEPHYR_SDK_DIR}/zephyr-sdk-${ZSDK_VERSION}
+ENV DEBIAN_FRONTEND=noninteractive
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get -y update && \
+	apt-get --no-install-recommends -y install \
+		ccache \
+		cmake \
+		device-tree-compiler \
+		dfu-util \
+		file \
+		g++-multilib \
+		gcc \
+		gcc-multilib \
+		git \
+		gperf \
+		libmagic1 \
+		libsdl2-dev \
+		make \
+		ninja-build \
+		python3-dev \
+		python3-pip \
+		python3-setuptools \
+		python3-tk \
+		python3-wheel \
+		wget \
+		xz-utils \
+		&& \
+	apt-get clean -y && \
+	apt-get autoremove --purge -y && \
+	rm -rf /var/lib/apt/lists/*
+
+
+FROM base AS step-sdk
+
+WORKDIR "${ZEPHYR_SDK_DIR}"
+ADD https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz zephyr-sdk.tar.xz
+RUN tar xf zephyr-sdk.tar.xz
+WORKDIR "${ZEPHYR_SDK}"
+RUN ./setup.sh -t ${TOOLCHAIN} -h
+
+
+
+
+
+FROM base
+ARG UID=1000
+ARG GID=1000
 ARG USERNAME="ubuntu"
 ENV DEBIAN_FRONTEND=noninteractive
-USER root
+ENV ZEPHYR_BASE=/home/${USERNAME}/workspace/zephyr
+ENV PATH="${ZEPHYR_BASE}/scripts:${PATH}"
 
 RUN apt-get -y update && \
 	apt-get --no-install-recommends -y install \
@@ -47,18 +99,36 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 RUN locale-gen $LANG
 
+# Install Python dependencies
+RUN	pip install --no-cache-dir --upgrade pip setuptools wheel && \
+		pip install --no-cache-dir \
+		-r https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/main/scripts/requirements.txt \
+		-r https://raw.githubusercontent.com/zephyrproject-rtos/mcuboot/main/scripts/requirements.txt \
+		west jsonschema && \
+	pip check
+
 # Hack udev to run inside a container
 RUN sed -i.bak -e '/if \[ ! -w \/sys \]/,+3 s/^/#/' /etc/init.d/udev
 
+# Add zephyr SDK
+COPY --from=step-sdk /opt/zephyr-sdk-${ZSDK_VERSION} /opt/zephyr-sdk-${ZSDK_VERSION}
+
 # install OpenOCD udev rules
-RUN cp ${ZEPHYR_SDK}/sysroots/x86_64-pokysdk-linux/usr/share/openocd/contrib/60-openocd.rules /etc/udev/rules.d
+COPY --from=step-sdk ${ZEPHYR_SDK}/sysroots/x86_64-pokysdk-linux/usr/share/openocd/contrib/60-openocd.rules /etc/udev/rules.d
 
 # Install Jlink
 RUN wget -q --post-data "accept_license_agreement=accepted" https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb && \
 	dpkg -i ./JLink_Linux_x86_64.deb && \
 	rm ./JLink_Linux_x86_64.deb
 
+# Install Ozone
+RUN wget -q --post-data "accept_license_agreement=accepted" https://www.segger.com/downloads/jlink/Ozone_Linux_x86_64.deb && \
+	dpkg -i ./Ozone_Linux_x86_64.deb && \
+	rm ./Ozone_Linux_x86_64.deb
+
+RUN groupadd -r ${USERNAME} && useradd -m -s /bin/bash -r -g ${USERNAME} ${USERNAME}
 USER ${USERNAME}
+WORKDIR /home/${USERNAME}/workspace
 # RUN usermod -a -G dialout ${USERNAME}
 # RUN usermod -a -G plugdev ${USERNAME}
 # WORKDIR /home/${USERNAME}/workspace

@@ -44,6 +44,7 @@
 		sw0 = &user_button;
 		adc0 = &adc1;
 		watchdog0 = &iwdg;
+		encoder0 = &mt6701;
 	};
 };
 
@@ -103,8 +104,8 @@ zephyr_udc0: &usb {
 	cs-gpios = <&gpioa 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 	status = "okay";
 
-	encoder: mt6701@0 {
-		compatible = "mt6701";
+	mt6701: mt6701@0 {
+		compatible = "novosense,mt6701";
 		reg = <0>;
 		spi-max-frequency = <DT_FREQ_M(15)>;
 		status = "okay";

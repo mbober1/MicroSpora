@@ -21,7 +21,7 @@ int main(void)
 		return 0;
 	}
 
-	const struct device *const dev = DEVICE_DT_GET_ONE(mt6701);
+	const struct device *const dev = DEVICE_DT_GET(DT_ALIAS(encoder0));
 
 	if (!device_is_ready(dev)) {
 		printk("sensor: device not ready.\n");
@@ -29,7 +29,9 @@ int main(void)
 	}
 
 	printf("device is %p, name is %s\n", dev, dev->name);
-static float value;
+static float value_deg;
+static float value_vel;
+
 	while (1) {
 		// gpio_pin_toggle_dt(&led);
 
@@ -38,25 +40,13 @@ static float value;
 			printk("sensor_sample_fetch failed ret %d\n", ret);
 			return 0;
 		}
-		
+
 		struct sensor_value angle;
+		struct sensor_value velocity;
 		sensor_channel_get(dev, SENSOR_CHAN_ROTATION, &angle);
-		value = sensor_value_to_float(&angle);
-		printk("Angle %d.%d", angle.val1, angle.val2);
-
-	// 	start_ticks = SysTick->VAL;
-	// 	cordic_sincos(angle, &sin, &cos);
-	// 	stop_ticks = SysTick->VAL;
-	// 	elapsed_ticks = start_ticks-stop_ticks;
-
-
-	// 	start_ticks2 = SysTick->VAL;
-	// 	sin2 = sinf(angle);
-	// 	cos2 = cosf(angle);
-	// 	stop_ticks2 = SysTick->VAL;
-	// 	elapsed_ticks2 = start_ticks2-stop_ticks2;
-
-	// 	printf("CORDIC: %d vs STDLIB: %d\n\r", elapsed_ticks, elapsed_ticks2);
+		sensor_channel_get(dev, SENSOR_CHAN_RPM, &velocity);
+		value_deg = sensor_value_to_float(&angle);
+		value_vel = sensor_value_to_float(&velocity);
 		// k_msleep(100);
 	}
 	return 0;

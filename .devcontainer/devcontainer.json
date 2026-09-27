@@ -1,6 +1,6 @@
 {
   "name": "Microspora",
-  "dockerFile": "Dockerfile.devel",
+  "dockerFile": "Dockerfile",
 
   "runArgs": [
   "--privileged"

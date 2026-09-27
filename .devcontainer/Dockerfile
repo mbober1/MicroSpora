@@ -1,7 +1,7 @@
-FROM ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0 AS base
+FROM ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b AS base
 
 ENV TOOLCHAIN="arm-zephyr-eabi"
-ENV ZSDK_VERSION="0.17.4"
+ENV ZSDK_VERSION="1.0.1"
 ARG ZEPHYR_SDK_DIR="/opt"
 ENV ZEPHYR_SDK=${ZEPHYR_SDK_DIR}/zephyr-sdk-${ZSDK_VERSION}
 ENV DEBIAN_FRONTEND=noninteractive
@@ -42,17 +42,16 @@ WORKDIR "${ZEPHYR_SDK_DIR}"
 ADD https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz zephyr-sdk.tar.xz
 RUN tar xf zephyr-sdk.tar.xz
 WORKDIR "${ZEPHYR_SDK}"
-RUN ./setup.sh -t ${TOOLCHAIN} -h
+RUN ./setup.sh -t arm-zephyr-eabi -t riscv64-zephyr-elf -h
 
 
 
 
 
-FROM base
+FROM base AS final
 ARG UID=1000
 ARG GID=1000
 ARG USERNAME="ubuntu"
-ENV DEBIAN_FRONTEND=noninteractive
 ENV ZEPHYR_BASE=/home/${USERNAME}/workspace/zephyr
 ENV PATH="${ZEPHYR_BASE}/scripts:${PATH}"
 
@@ -87,7 +86,8 @@ RUN apt-get -y update && \
 		locales \
 		udev \
 		wget \
-		openocd \
+		picocom \
+		usbutils \
 		&& \
 	apt-get clean -y && \
 	apt-get autoremove --purge -y && \
@@ -100,35 +100,30 @@ ENV LC_ALL=en_US.UTF-8
 RUN locale-gen $LANG
 
 # Install Python dependencies
-RUN	pip install --no-cache-dir --upgrade pip setuptools wheel && \
-		pip install --no-cache-dir \
+RUN	pip3 install --no-cache-dir --break-system-packages \
 		-r https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/main/scripts/requirements.txt \
 		-r https://raw.githubusercontent.com/zephyrproject-rtos/mcuboot/main/scripts/requirements.txt \
-		west jsonschema && \
-	pip check
-
-# Hack udev to run inside a container
-RUN sed -i.bak -e '/if \[ ! -w \/sys \]/,+3 s/^/#/' /etc/init.d/udev
+		GitPython imgtool junitparser junit2html numpy protobuf PyGithub \
+		pylint sh statistics west \
+		nrf-regtool~=7.0.0 jsonschema
 
 # Add zephyr SDK
 COPY --from=step-sdk /opt/zephyr-sdk-${ZSDK_VERSION} /opt/zephyr-sdk-${ZSDK_VERSION}
 
-# install OpenOCD udev rules
-COPY --from=step-sdk ${ZEPHYR_SDK}/sysroots/x86_64-pokysdk-linux/usr/share/openocd/contrib/60-openocd.rules /etc/udev/rules.d
-
 # Install Jlink
 RUN wget -q --post-data "accept_license_agreement=accepted" https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb && \
+	/lib/systemd/systemd-udevd -d && \
 	dpkg -i ./JLink_Linux_x86_64.deb && \
 	rm ./JLink_Linux_x86_64.deb
 
 # Install Ozone
-RUN wget -q --post-data "accept_license_agreement=accepted" https://www.segger.com/downloads/jlink/Ozone_Linux_x86_64.deb && \
+RUN wget -q https://www.segger.com/downloads/jlink/Ozone_Linux_x86_64.deb && \
 	dpkg -i ./Ozone_Linux_x86_64.deb && \
 	rm ./Ozone_Linux_x86_64.deb
 
-RUN groupadd -r ${USERNAME} && useradd -m -s /bin/bash -r -g ${USERNAME} ${USERNAME}
+# Install latest pyocd rules
+ADD https://github.com/pyocd/pyOCD/raw/refs/heads/main/udev/49-stlinkv3.rules /etc/udev/rules.d/49-stlinkv3.rules
+ADD --chmod=+x https://files.nordicsemi.com/ui/api/v1/download?repoKey=swtools&path=external/nrfutil/executables/x86_64-unknown-linux-gnu/nrfutil&isNativeBrowsing=false /usr/local/bin/nrfutil
+
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}/workspace
-# RUN usermod -a -G dialout ${USERNAME}
-# RUN usermod -a -G plugdev ${USERNAME}
-# WORKDIR /home/${USERNAME}/workspace

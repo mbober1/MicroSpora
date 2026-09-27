@@ -135,7 +135,28 @@ zephyr_udc0: &usb {
 	drv8316: drv8316@0 {
 		compatible = "ti,drv83xx";
 		reg = <0>;
-		spi-max-frequency = <DT_FREQ_M(1)>;
+		spi-max-frequency = <DT_FREQ_M(40)>;
+		enable-gpios = <&gpiob 7 0>;
+		pwm-mode = <0>;
+		slew-rate = <3>;
+		sdo-mode = <1>;
+		csa-gain = <3>;
+		pwm-100-duty-frequency = <0>;
+		ocp-mode = <0>;
+		ocp-level = <0>;
+		ocp-retry = <0>;
+		ocp-deglitch = <0>;
+		recirculation-mode = <0>;
+		buck-voltage = <0>;
+		buck-current-limit = <0>;
+		delay-target = <0>;
+		overvoltage-level = <0>;
+		overtemperature-report;
+		spi-fault-report;
+		ocp-cycle-by-cycle;
+		buck-enable;
+		buck-power-sequencing;
+		delay-compensation;
 		status = "okay";
 	};
 };
@@ -149,7 +170,8 @@ zephyr_udc0: &usb {
 		pinctrl-names = "default";
 
 		adc-resolution = <12>;
-		adc-tsample = <48>;
+		adc-tsample = <13>;
+		adc-oversampling = <4>;
 		adc-channels = <3 2 1>;
 		adc-trigger = <STM32_ADC12_INJ_TRIG_TIM1_TRGO>;
 	};
@@ -162,12 +184,12 @@ zephyr_udc0: &usb {
 		status = "okay";
 		compatible = "st,stm32-svpwm";
 		currsmp = <&currsmp>;
+		drv8316 = <&drv8316>;
 		pinctrl-0 = <&tim1_ch1_pa8 &tim1_ch2_pa9 &tim1_ch3_pa10 &tim1_ch1n_pb13 &tim1_ch2n_pb14 &tim1_ch3n_pb15 &tim1_bkin2_pa11>;
 		pinctrl-names = "default";
 		driver {
 			compatible = "ti,drv8316c";
 			enable-comp-outputs;
-			enable-gpios = <&gpiob 7 0>;
 		};
 	};
 };

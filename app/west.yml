@@ -6,14 +6,16 @@ manifest:
     path: app
 
   remotes:
-    - name: zephyr
+    - name: mbober1
+      url-base: https://github.com/mbober1
+    - name: upstream
       url-base: https://github.com/zephyrproject-rtos
 
   projects:
     - name: zephyr
-      remote: zephyr
+      remote: upstream
       repo-path: zephyr
-      revision: main
+      revision: v4.4.2
       import:
         name-allowlist:
           - cmsis
@@ -23,11 +25,20 @@ manifest:
           - segger
 
     - name: mt6701
+      remote: mbober1
+      repo-path: MT6701-Zephyr-Module
       path: modules/lib/mt6701
       revision: master
-      url: https://github.com/mbober1/MT6701-Zephyr-Module
+
+    - name: drv83xx
+      remote: mbober1
+      repo-path: drv83xx-Zephyr-Module
+      path: modules/lib/drv83xx
+      revision: master
 
     - name: spinner
+      remote: mbober1
+      repo-path: spinner
       path: modules/lib/spinner
       revision: main
-      url: https://github.com/teslabs/spinner
+ 

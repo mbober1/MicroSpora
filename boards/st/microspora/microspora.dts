@@ -15,6 +15,7 @@
 
 	chosen {
 		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 	};
@@ -120,7 +121,7 @@ zephyr_udc0: &usb {
 		compatible = "spinner,mt6701-feedback";
 		sensor = <&mt6701>;
 		pole-pairs = <11>;
-		phase-offset-degrees = <310>;
+		phase-offset-degrees = <268>;
 		sampling-period-ms = <1>;
 		status = "okay";
 	};
@@ -171,7 +172,7 @@ zephyr_udc0: &usb {
 
 		adc-resolution = <12>;
 		adc-tsample = <13>;
-		adc-oversampling = <4>;
+		adc-oversampling = <2>;
 		adc-channels = <3 2 1>;
 		adc-trigger = <STM32_ADC12_INJ_TRIG_TIM1_TRGO>;
 	};

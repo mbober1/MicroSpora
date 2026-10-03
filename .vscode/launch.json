@@ -2,21 +2,34 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "JLink Debug STM32G431CB",
+      "name": "Debug STM32G431CB",
       "cwd": "${workspaceFolder}",
       "executable": "${workspaceFolder}/build/zephyr/zephyr.elf",
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "jlink",
       "serverpath": "/opt/SEGGER/JLink/JLinkGDBServerCLExe",
-      "armToolchainPath": "${env:ZEPHYR_SDK}/${env:TOOLCHAIN}/bin",
-      "toolchainPrefix": "${env:TOOLCHAIN}",
+      "armToolchainPath": "${env:ZEPHYR_SDK}/gnu/arm-zephyr-eabi/bin",
+      "toolchainPrefix": "arm-zephyr-eabi",
       "interface": "swd",
-      // "serverArgs": ["-speed", "50"],
       "device": "STM32G431CB",
       "svdFile": "STM32G431xx.svd",
-      "preLaunchTask": "Build",
+      "preLaunchTask": "Build MicroSpora",
       "runToEntryPoint": "main"
+    },
+    {
+      "name": "Debug native_sim",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/zephyr/zephyr.exe",
+      "args": [],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "preLaunchTask": "Build native"
     },
   ]
 }

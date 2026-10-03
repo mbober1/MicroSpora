@@ -7,7 +7,7 @@
                 "${env:ZEPHYR_BASE}/include"
             ],
             "defines": [],
-            "compilerPath": "${env:ZEPHYR_SDK}/${env:TOOLCHAIN}/bin/${env:TOOLCHAIN}-gcc",
+            "compilerPath": "${env:ZEPHYR_SDK}/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
             "cStandard": "c17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"

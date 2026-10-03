@@ -1,6 +1,5 @@
 FROM ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b AS base
 
-ENV TOOLCHAIN="arm-zephyr-eabi"
 ENV ZSDK_VERSION="1.0.1"
 ARG ZEPHYR_SDK_DIR="/opt"
 ENV ZEPHYR_SDK=${ZEPHYR_SDK_DIR}/zephyr-sdk-${ZSDK_VERSION}
@@ -60,6 +59,7 @@ RUN apt-get -y update && \
 		build-essential \
 		ca-certificates \
 		debhelper \
+		gdb \
 		libfontconfig1 \
 		libfreetype6 \
 		libglib2.0-0 \
@@ -84,10 +84,10 @@ RUN apt-get -y update && \
 		libxkbcommon0 \
 		libxrender1 \
 		locales \
-		udev \
-		wget \
 		picocom \
+		udev \
 		usbutils \
+		wget \
 		&& \
 	apt-get clean -y && \
 	apt-get autoremove --purge -y && \

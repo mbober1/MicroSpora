@@ -4,17 +4,22 @@
 #include <zephyr/kernel.h>
 #include <spinner/drivers/currsmp.h>
 #include <spinner/drivers/svpwm.h>
+#include <spinner/drivers/feedback.h>
 
 #define VOLTAGE_AMPLITUDE 0.3f
-#define ANGLE_STEP_DEGREES 1.0f
+#define ANGLE_STEP_DEGREES 5.0f
 #define STEP_PERIOD_MS 1
 
 const struct device *currsmp = DEVICE_DT_GET(DT_NODELABEL(currsmp));
+const struct device *feedback = DEVICE_DT_GET(DT_NODELABEL(feedback));
 struct currsmp_curr curr;
-
+static volatile float measured_rpm;
+static volatile float eangle;
 
 static void noop_regulation_callback(void *ctx)
 {
+    eangle = feedback_get_eangle(feedback);
+	measured_rpm = feedback_get_speed(feedback);
 	currsmp_get_currents(currsmp, &curr);
     (void)ctx;
 }
@@ -27,6 +32,10 @@ int main(void)
     if (!device_is_ready(currsmp) || !device_is_ready(svpwm)) {
         return 0;
     }
+
+	if (!device_is_ready(feedback)) {
+		return 0;
+	}
 
     currsmp_configure(currsmp, noop_regulation_callback, NULL);
     currsmp_start(currsmp);

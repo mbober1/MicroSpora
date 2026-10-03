@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"zephyr-docs": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@aarav-j/zephyr-mcp-server"
+			],
+			"type": "stdio"
+		}
+	},
+	"inputs": []
+}

@@ -14,8 +14,6 @@
 	compatible = "st,stm32g431cb-nucleo";
 
 	chosen {
-		zephyr,console = &usart1;
-		zephyr,shell-uart = &usart1;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 	};
@@ -52,16 +50,6 @@
 	};
 };
 
-/*
-zephyr_udc0: &usb {
-	pinctrl-0 = <&usb_dm_pa11 &usb_dp_pa12>;
-	pinctrl-names = "default";
-	status = "okay";
-};
-
-#include <../boards/common/usb/cdc_acm_serial.dtsi>
-*/
-
 &clk_hse {
 	clock-frequency = <DT_FREQ_M(16)>;
 	status = "okay";
@@ -95,12 +83,6 @@ zephyr_udc0: &usb {
 	status = "okay";
 };
 
-&usart1 {
-	pinctrl-0 = <&usart1_tx_pb6 &usart1_rx_pb7>;
-	pinctrl-names = "default";
-	current-speed = <115200>;
-	status = "okay";
-};
 
 &spi1 {
 	pinctrl-0 = <&spi1_sck_pa5 &spi1_miso_pa6>;
@@ -121,8 +103,8 @@ zephyr_udc0: &usb {
 		compatible = "spinner,mt6701-feedback";
 		sensor = <&mt6701>;
 		pole-pairs = <11>;
-		phase-offset-degrees = <268>;
-		sampling-period-ms = <1>;
+		phase-offset-degrees = <278>;
+		sampling-period-ms = <3>;
 		status = "okay";
 	};
 };
